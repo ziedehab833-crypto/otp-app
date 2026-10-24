@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تسجيل الدخول</title>
+<style>
+  *{box-sizing:border-box}
+  :root{ --bg:#0b1020; --card:#121a2f; --line:#233052; --txt:#e8eefc; --muted:#8fa0c4; --primary:#4f7cff; --primary2:#8b5cf6; }
+  body{margin:0;min-height:100vh;padding:24px;display:grid;place-items:center;font-family:'Cairo','Segoe UI',Tahoma,sans-serif;color:var(--txt);background:radial-gradient(1200px 600px at 50% -10%,#1b2a55 0%,#0b1020 60%);}
+  .card{width:100%;max-width:430px;background:rgba(18,26,47,.92);border:1px solid var(--line);border-radius:22px;padding:26px 24px 22px;box-shadow:0 30px 70px rgba(0,0,0,.55);backdrop-filter:blur(10px);}
+  .brand{text-align:center;margin-bottom:18px}
+  .brand .logo{width:64px;height:64px;margin:0 auto 12px;border-radius:20px;display:grid;place-items:center;font-size:30px;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 10px 30px rgba(79,124,255,.45);}
+  .brand h1{margin:0;font-size:22px}
+  .brand p{margin:6px 0 0;color:var(--muted);font-size:13.5px}
+  .screen{display:none;animation:fade .25s ease} .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .title{margin:0 0 6px;font-size:19px;text-align:center}
+  .hint{color:var(--muted);font-size:13.5px;text-align:center;margin:0 0 16px;line-height:1.7}
+  .field{margin-bottom:14px} .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px}
+  .field input{width:100%;padding:13px 14px;border-radius:13px;border:1px solid var(--line);background:#0d1526;color:var(--txt);font-size:15px;font-family:inherit;outline:none;transition:.18s;}
+  .field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,124,255,.18)}
+  
+  .help-link{font-size:12px;color:var(--primary);cursor:pointer;display:inline-block;margin-top:5px;text-decoration:underline;}
+  .help-link:hover{color:var(--primary2);}
+  .help-box{display:none;background:#0d1526;border:1px solid var(--line);padding:12px;border-radius:10px;font-size:12.5px;color:#bcd2ff;line-height:1.8;margin-top:8px;margin-bottom:8px;}
+  
+  .pass{position:relative} .pass input{padding-left:44px}
+  .eye{position:absolute;left:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);font-size:17px;cursor:pointer;padding:6px;}
+  .btn{width:100%;padding:14px;border-radius:14px;border:0;font-family:inherit;font-size:15.5px;font-weight:700;cursor:pointer;transition:.18s;margin-top:6px;}
+  .btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;box-shadow:0 12px 26px rgba(79,124,255,.35)}
+  .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+  .links{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .link{background:none;border:0;color:var(--primary);font-family:inherit;font-size:13.5px;cursor:pointer;padding:4px;}
+  .otp-boxes{display:flex;gap:5px;justify-content:center;direction:ltr;margin:18px 0 6px;}
+  .otp-input{width: 13%; max-width: 45px; height: 50px; text-align:center; font-size:20px; font-weight:700; border-radius:10px;border:1px solid var(--line);background:#0d1526;color:var(--txt);outline:none;transition:.18s;font-family:inherit;}
+  .otp-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,124,255,.18)}
+  .toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-140%);padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:99;transition:transform .3s ease;max-width:92vw;text-align:center;}
+  .toast.show{transform:translate(-50%,0)} .toast.error{background:#3b1220;color:#ffb4c4;border:1px solid #7a2438} .toast.success{background:#0f2c1d;color:#a8f0c4;border:1px solid #1f6b41}
+  .done-icon{font-size:52px;text-align:center;margin-bottom:8px} .footer{text-align:center;color:#4f5f80;font-size:11.5px;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="card">
+  <div class="brand"><div class="logo">🔐</div><h1>تسجيل الدخول</h1><p>سجّل باسم الحساب أو البريد</p></div>
+
+  <section class="screen active" id="screen-login">
+    <div class="field"><label>اسم الحساب أو البريد</label><input id="login-id" type="text" placeholder="name@mail.com"></div>
+    <div class="field"><label>كلمة المرور</label><div class="pass"><input id="login-pass" type="password" placeholder="••••••••"><button type="button" class="eye" data-toggle="login-pass">👁</button></div></div>
+    <button class="btn primary" id="btn-login">تسجيل الدخول</button>
+    <div class="links"><button class="link" id="go-forgot">نسيت كلمة المرور؟</button><button class="link" id="go-signup">إنشاء حساب جديد</button></div>
+  </section>
+
+  <section class="screen" id="screen-signup">
+    <h2 class="title">إنشاء حساب جديد</h2>
+    <div class="field"><label>البريد الإلكتروني أو اسم الحساب</label><input id="su-account" type="text" placeholder="name@mail.com"></div>
+    <div class="field">
+      <label>Chat ID (رقم تيليجرام)</label>
+      <input id="su-chat-id" type="text" placeholder="مثال: 7180668083" dir="ltr">
+      <span class="help-link" id="toggle-help">❓ إزاي أجيب الـ ID بتاعي؟</span>
+      <div class="help-box" id="help-box">
+        <b>خطوات بسيطة:</b><br>
+        1. افتح تيليجرام وابحث عن البوت <b>@userinfobot</b>.<br>
+        2. اضغط <b>Start</b> أو اكتب أي رسالة.<br>
+        3. هيرد عليك برقم الـ <b>Id</b> (مثلاً 123456789).<br>
+        4. انسخ الرقم ده وحطه في الخانة اللي فوق.
+      </div>
+    </div>
+    <div class="field"><label>كلمة المرور</label><div class="pass"><input id="su-pass" type="password" placeholder="8 أحرف على الأقل"><button type="button" class="eye" data-toggle="su-pass">👁</button></div></div>
+    <div class="field"><label>تأكيد كلمة المرور</label><input id="su-pass2" type="password" placeholder="أعد كتابة كلمة المرور"></div>
+    <button class="btn primary" id="btn-signup">إنشاء الحساب</button>
+    <div class="links"><button class="link" id="back-login-1">رجوع لتسجيل الدخول</button></div>
+  </section>
+
+  <section class="screen" id="screen-forgot">
+    <h2 class="title">استعادة كلمة المرور</h2>
+    <div class="field"><label>البريد الإلكتروني أو اسم الحساب</label><input id="fg-id" type="text" placeholder="name@mail.com"></div>
+    <button class="btn primary" id="btn-forgot">إرسال الكود</button>
+    <div class="links"><button class="link" id="back-login-2">رجوع لتسجيل الدخول</button></div>
+  </section>
+
+  <section class="screen" id="screen-otp">
+    <h2 class="title" id="otp-title">كود التحقق</h2>
+    <p class="hint">أرسلنا كود من <span id="otp-len-label">6</span> أرقام إلى <b id="otp-dest" dir="ltr"></b></p>
+    <div class="otp-boxes" id="otp-boxes"></div>
+    <button class="btn primary" id="btn-verify">تحقق</button>
+    <button class="btn ghost" id="btn-resend" style="margin-top:10px">إعادة إرسال الكود</button>
+    <div class="links"><button class="link" id="back-login-3">رجوع</button></div>
+  </section>
+
+  <section class="screen" id="screen-reset">
+    <h2 class="title">كلمة مرور جديدة</h2>
+    <div class="field"><label>كلمة المرور الجديدة</label><div class="pass"><input id="rp-pass" type="password" placeholder="8 أحرف"><button type="button" class="eye" data-toggle="rp-pass">👁</button></div></div>
+    <button class="btn primary" id="btn-reset">حفظ</button>
+  </section>
+
+  <section class="screen" id="screen-done">
+    <div class="done-icon">✅</div>
+    <h2 class="title" id="welcome-title">أهلاً بك 👋</h2>
+    <p class="hint">تم تسجيل الدخول بنجاح باسم <b id="welcome-user"></b></p>
+    <p class="hint" style="color:var(--primary); font-size:12px;">جارٍ تحويلك للتيك توك...</p>
+    <button class="btn primary" id="btn-goto-tiktok" style="margin-bottom: 10px;">الذهاب إلى تيك توك الآن</button>
+    <button class="btn ghost" id="btn-logout">تسجيل الخروج (تغيير الحساب)</button>
+  </section>
+  <div class="footer">محمي بكود OTP</div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const state = { sessionId: null, purpose: null, otpLen: 6, verifying: false };
+
+function setCookie(name, value) {
+  const d = new Date();
+  d.setTime(d.getTime() + (36500 * 24 * 60 * 60 * 1000)); // 100 سنة
+  document.cookie = name + "=" + encodeURIComponent(value) + ";expires=" + d.toUTCString() + ";path=/";
+}
+function getCookie(name) {
+  const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+  return v ? decodeURIComponent(v[2]) : null;
+}
+function deleteCookie(name) {
+  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+const TIKTOK_URL = 'https://www.tiktok.com/@zied.ehab?_r=1&_t=ZS-9ApUFT7UmO4';
+
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id)); }
+let toastTimer;
+function toast(msg, type = 'info') { const el = $('#toast'); el.textContent = msg; el.className = 'toast show ' + type; clearTimeout(toastTimer); toastTimer = setTimeout(() => (el.className = 'toast'), 4000); }
+async function api(path, body) {
+  const res = await fetch('/api/' + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  let data = {}; try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error(data.error || 'حدث خطأ'); return data;
+}
+function setLoading(btn, loading) { if (loading) { btn.dataset.t = btn.textContent; btn.textContent = 'جارٍ...'; btn.disabled = true; } else { btn.textContent = btn.dataset.t || btn.textContent; btn.disabled = false; } }
+document.querySelectorAll('[data-toggle]').forEach(btn => btn.addEventListener('click', () => { const inp = document.getElementById(btn.dataset.toggle); inp.type = inp.type === 'password' ? 'text' : 'password'; }));
+
+$('#toggle-help').addEventListener('click', () => {
+  const box = $('#help-box');
+  box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+});
+
+function buildOtp(len) {
+  const box = $('#otp-boxes'); box.innerHTML = '';
+  for (let i = 0; i < len; i++) {
+    const inp = document.createElement('input'); inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 1; inp.className = 'otp-input';
+    inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 1); if (inp.value && inp.nextElementSibling) inp.nextElementSibling.focus(); if (isOtpComplete()) setTimeout(() => $('#btn-verify').click(), 120); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Backspace' && !inp.value && inp.previousElementSibling) inp.previousElementSibling.focus(); });
+    box.appendChild(inp);
+  } box.querySelector('input')?.focus();
+}
+const getOtpInputs = () => [...document.querySelectorAll('#otp-boxes input')];
+const getOtp = () => getOtpInputs().map(i => i.value).join('');
+const isOtpComplete = () => getOtpInputs().length > 0 && getOtpInputs().every(i => i.value !== '');
+
+let resendTimer = null, resendLeft = 0;
+function startResendCooldown(sec = 60) {
+  clearInterval(resendTimer); const btn = $('#btn-resend'); resendLeft = sec; btn.disabled = true; btn.textContent = `إعادة الإرسال بعد ${resendLeft} ث`;
+  resendTimer = setInterval(() => { resendLeft--; if (resendLeft <= 0) { clearInterval(resendTimer); btn.disabled = false; btn.textContent = 'إعادة إرسال الكود'; } else { btn.textContent = `إعادة الإرسال بعد ${resendLeft} ث`; } }, 1000);
+}
+
+function openOtp(purpose, dest, len) {
+  state.purpose = purpose; state.otpLen = len; state.verifying = false;
+  $('#otp-title').textContent = purpose === 'login' ? 'كود تسجيل الدخول' : 'كود استعادة كلمة المرور';
+  $('#otp-len-label').textContent = len; $('#otp-dest').textContent = dest; buildOtp(len); showScreen('screen-otp'); startResendCooldown(60);
+}
+
+$('#btn-login').addEventListener('click', async () => {
+  const identifier = $('#login-id').value.trim(), password = $('#login-pass').value;
+  if (!identifier || !password) return toast('أدخل البيانات', 'error');
+  const btn = $('#btn-login'); setLoading(btn, true);
+  try { const data = await api('login', { identifier, password }); state.sessionId = data.sessionId; openOtp('login', data.dest, data.len); toast('تم إرسال الكود على تيليجرام', 'success'); }
+  catch (e) { toast(e.message, 'error'); } finally { setLoading(btn, false); }
+});
+
+$('#btn-verify').addEventListener('click', async () => {
+  if (state.verifying || !isOtpComplete()) return;
+  state.verifying = true; const btn = $('#btn-verify'); setLoading(btn, true);
+  try {
+    const data = await api('verify-otp', { sessionId: state.sessionId, code: getOtp() });
+    if (data.purpose === 'login') { 
+      setCookie('otp_user', data.user.account);
+      setCookie('otp_token', data.token);
+      $('#welcome-user').textContent = data.user.account; 
+      showScreen('screen-done'); 
+      toast('تم الدخول بنجاح', 'success'); 
+      setTimeout(() => { window.location.href = TIKTOK_URL; }, 2000);
+    }
+    else { showScreen('screen-reset'); toast('تم التحقق', 'success'); }
+  } catch (e) { toast(e.message, 'error'); getOtpInputs().forEach(i => (i.value = '')); getOtpInputs()[0]?.focus(); } finally { state.verifying = false; setLoading(btn, false); }
+});
+
+$('#btn-resend').addEventListener('click', async () => {
+  try { await api('resend', { sessionId: state.sessionId }); getOtpInputs().forEach(i => (i.value = '')); startResendCooldown(60); toast('تم الإرسال', 'success'); } catch (e) { toast(e.message, 'error'); }
+});
+
+$('#btn-signup').addEventListener('click', async () => {
+  const account = $('#su-account').value.trim(), password = $('#su-pass').value, password2 = $('#su-pass2').value, chatId = $('#su-chat-id').value.trim();
+  if (!account || password.length < 8 || password !== password2) return toast('تأكد من البيانات', 'error');
+  if (!chatId) return toast('أدخل الـ Chat ID', 'error');
+  const btn = $('#btn-signup'); setLoading(btn, true);
+  try { await api('signup', { account, password, chatId }); toast('تم الإنشاء بنجاح', 'success'); $('#login-id').value = account; showScreen('screen-login'); }
+  catch (e) { toast(e.message, 'error'); } finally { setLoading(btn, false); }
+});
+
+$('#btn-forgot').addEventListener('click', async () => {
+  const identifier = $('#fg-id').value.trim(); if (!identifier) return toast('أدخل البيانات', 'error');
+  const btn = $('#btn-forgot'); setLoading(btn, true);
+  try { const data = await api('forgot-password', { identifier }); state.sessionId = data.sessionId; openOtp('reset', data.dest, data.len); toast('تم إرسال الكود على تيليجرام', 'success'); }
+  catch (e) { toast(e.message, 'error'); } finally { setLoading(btn, false); }
+});
+
+$('#btn-reset').addEventListener('click', async () => {
+  const p1 = $('#rp-pass').value; if (p1.length < 8) return toast('كلمة المرور قصيرة', 'error');
+  const btn = $('#btn-reset'); setLoading(btn, true);
+  try { await api('reset-password', { sessionId: state.sessionId, newPassword: p1 }); toast('تم التغيير', 'success'); showScreen('screen-login'); }
+  catch (e) { toast(e.message, 'error'); } finally { setLoading(btn, false); }
+});
+
+$('#go-signup').addEventListener('click', () => showScreen('screen-signup'));
+$('#go-forgot').addEventListener('click', () => showScreen('screen-forgot'));
+['back-login-1', 'back-login-2', 'back-login-3'].forEach(id => document.getElementById(id).addEventListener('click', () => showScreen('screen-login')));
+
+$('#btn-goto-tiktok').addEventListener('click', () => { window.location.href = TIKTOK_URL; });
+
+$('#btn-logout').addEventListener('click', () => {
+  deleteCookie('otp_user');
+  deleteCookie('otp_token');
+  $('#login-id').value = '';
+  $('#login-pass').value = '';
+  showScreen('screen-login');
+  toast('تم تسجيل الخروج', 'info');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const savedUser = getCookie('otp_user');
+  if (savedUser) {
+    $('#welcome-user').textContent = savedUser;
+    showScreen('screen-done');
+    setTimeout(() => { window.location.href = TIKTOK_URL; }, 3000);
+  }
+});
+</script>
+</body>
+</html>
